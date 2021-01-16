@@ -5,18 +5,21 @@ import json
 from datetime import datetime
 import csv
 
+IA_URL = 'https://be-api.us.archive.org/views/v1/short/'
+
 # gets item stats and adds them to the specified dictionary
 def get_item_stats(item):
     # sample item identifier: ALCFJamesKilgoreClip5217
 
     # data on number of views
-    stats_url = 'https://be-api.us.archive.org/views/v1/short/' + item.identifier 
+    stats_url = IA_URL + item.identifier 
     item_stats = requests.get(stats_url)
 
     # update view stats json to include identifier, title, and timestamp
     this_item = item_stats.json()
     this_item[item.identifier]['identifier'] = item.identifier
     this_item[item.identifier]['title'] = item.metadata['title']
+    this_item[item.identifier]['creator'] = item.metadata['creator']
     this_item[item.identifier]['timestamp'] = str(datetime.now())
 
     return this_item
@@ -31,14 +34,14 @@ def get_collection_items(collection_id):
     return item_objects
 
 def get_collection_stats(collection_id):
-    url = "https://be-api.us.archive.org/views/v1/short/" + collection_id
+    url = IA_URL + collection_id
     collection_stats = requests.get(url)
     print("Collection view stats are:")
     print(json.dumps(collection_stats.json(), indent=3))
     return collection_stats
 
 if __name__ == '__main__':
-    collection_url = input("Paste the collection URL here:")
+    collection_url = input("Paste the collection URL or id here:")
     collection_id = collection_url.split("/")[-1]
     collection_id = collection_id.split("?")[0]  # clean up url
     
@@ -46,16 +49,17 @@ if __name__ == '__main__':
     get_collection_stats(collection_id)
 
     # get all items from collection
+    print("Grabbing all items from this collection...")
     items = get_collection_items(collection_id)
 
     # grab all item stats
     collection_stats = {}
-    x = 0
     for item in items: 
         item_info = get_item_stats(item)
         collection_stats.update(item_info)
     
     # print collection stats to CSV
+    print("Writing all data to file...")
     filename = collection_id + '-stats-' + str(datetime.now()) + '.csv'
     datafile = open(filename, 'w')
     csv_writer = csv.writer(datafile)
