@@ -2,7 +2,8 @@
 Python script to scrape viewership data for every item in an Internet Archive collection.
 
 ### To run 
-```python main.py```
+First make sure you have the dependencies installed: ```pip install -r requirements.txt```
+Then run: ```python main.py```
 
 ### Usage
 Copy the URL or id of a collection from [Internet Archive](https://archive.org/) and enter when prompted. 

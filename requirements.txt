@@ -1,0 +1,2 @@
+internetarchive==1.9.6
+requests==2.25.1
